@@ -115,10 +115,10 @@ interface ChatMessage {
 }
 
 const dealTypeOptions = [
-  { label: "📋  Lease", value: "lease" },
-  { label: "💰  Finance", value: "finance" },
-  { label: "💵  Cash Purchase", value: "cash" },
-  { label: "🔍  Inventory", value: "inventory" },
+  { label: "Lease", value: "lease" },
+  { label: "Finance", value: "finance" },
+  { label: "Cash Purchase", value: "cash" },
+  { label: "Inventory", value: "inventory" },
 ];
 
 const stageOptions: Record<string, { label: string; value: string }[]> = {
@@ -288,7 +288,6 @@ export default function GeneratePage() {
     e.preventDefault();
     const value = inputValue.trim();
 
-    // If in refine mode, handle as a refinement request
     if (refineMode) {
       if (!value) return;
       addMessages({ id: `user-${Date.now()}`, role: "user", type: "text", content: value });
@@ -341,7 +340,6 @@ export default function GeneratePage() {
       const data = await response.json();
       const email = { subject: data.email.subject, body: data.email.body };
 
-      // Store current email for refinement
       setCurrentEmail(email);
       setRefineHistory([]);
 
@@ -375,7 +373,6 @@ export default function GeneratePage() {
         },
       ]);
 
-      // Enter refine mode — input bar stays open
       setRefineMode(true);
     } catch (err) {
       setMessages((prev) => [
@@ -396,7 +393,6 @@ export default function GeneratePage() {
   const handleRefine = async (userRequest: string) => {
     if (!currentEmail) return;
 
-    // Check for canned answers first — instant response, no API cost
     const cannedAnswer = getCannedAnswer(userRequest);
     if (cannedAnswer) {
       setRefineHistory((prev) => [
@@ -441,11 +437,9 @@ export default function GeneratePage() {
       const data = await response.json();
 
       if (data.type === "email") {
-        // Claude returned an updated email
         const newEmail = data.email;
         setCurrentEmail(newEmail);
 
-        // Track the conversation for context
         setRefineHistory((prev) => [
           ...prev,
           { role: "user", content: userRequest },
@@ -456,7 +450,6 @@ export default function GeneratePage() {
           const filtered = prev.filter((m) => m.type !== "loading");
           const newMsgs: ChatMessage[] = [];
 
-          // Add conversational pre-text if any
           if (data.message) {
             newMsgs.push({
               id: `refine-text-${Date.now()}`,
@@ -466,7 +459,6 @@ export default function GeneratePage() {
             });
           }
 
-          // Add the new email
           newMsgs.push({
             id: `email-${Date.now()}`,
             role: "assistant",
@@ -478,7 +470,6 @@ export default function GeneratePage() {
             },
           });
 
-          // Keep the refine prompt and options
           newMsgs.push({
             id: `refine-prompt-${Date.now()}`,
             role: "assistant",
@@ -500,7 +491,6 @@ export default function GeneratePage() {
           return [...filtered, ...newMsgs];
         });
       } else {
-        // Claude gave a conversational response (advice, etc.)
         setRefineHistory((prev) => [
           ...prev,
           { role: "user", content: userRequest },
@@ -632,14 +622,45 @@ export default function GeneratePage() {
 
   // ── Render ──
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0a] text-white">
+    <div className="flex flex-col h-screen bg-[#f8f9fa] text-[#1a1a2e]">
       {/* Header */}
-      <header className="border-b border-[#1e1e1e] py-3 px-4 sm:px-6 flex-shrink-0">
+      <header className="bg-white border-b border-[#e5e7eb] py-3 px-4 sm:px-6 flex-shrink-0">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold text-white hover:opacity-80 transition flex items-center gap-2.5">
-            <Image src="/logo.jpg" alt="CarSalesGuy" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
+          <Link href="/" className="text-lg font-bold text-[#1a1a2e] hover:opacity-70 transition flex items-center gap-2.5">
+            <Image src="/logo.jpg" alt="CarSalesGuy" width={32} height={32} className="w-8 h-8 rounded-lg object-cover" />
             CarSalesGuy AI
           </Link>
+          <button
+            onClick={() => {
+              setDealType(null);
+              setStage(null);
+              setFields([]);
+              setCurrentFieldIndex(0);
+              setCollectedData({});
+              setAwaitingInput(false);
+              setRefineMode(false);
+              setCurrentEmail(null);
+              setRefineHistory([]);
+              setMessages([
+                {
+                  id: "welcome-new",
+                  role: "assistant",
+                  type: "text",
+                  content: "Let's start fresh.",
+                },
+                {
+                  id: `deal-type-ask-${Date.now()}`,
+                  role: "assistant",
+                  type: "options",
+                  content: "What type of deal are you working on?",
+                  options: dealTypeOptions,
+                },
+              ]);
+            }}
+            className="text-sm font-medium text-[#6b7280] hover:text-[#1e3a5f] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#1e3a5f]/5"
+          >
+            New Deal
+          </button>
         </div>
       </header>
 
@@ -650,12 +671,12 @@ export default function GeneratePage() {
             if (msg.type === "loading") {
               return (
                 <div key={msg.id} className="flex gap-3">
-                  <Image src="/logo.jpg" alt="CarSalesGuy" width={32} height={32} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                  <div className="bg-[#1e1e1e] rounded-2xl rounded-tl-sm px-5 py-4">
+                  <Image src="/logo.jpg" alt="CarSalesGuy" width={36} height={36} className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
+                  <div className="bg-white rounded-2xl rounded-tl-md px-5 py-4 shadow-sm border border-[#e5e7eb]">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#9ca3af] rounded-full animate-bounce [animation-delay:0ms]" />
-                      <span className="w-1.5 h-1.5 bg-[#9ca3af] rounded-full animate-bounce [animation-delay:150ms]" />
-                      <span className="w-1.5 h-1.5 bg-[#9ca3af] rounded-full animate-bounce [animation-delay:300ms]" />
+                      <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:0ms]" />
+                      <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:150ms]" />
+                      <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:300ms]" />
                       <span className="text-[#9ca3af] text-sm ml-2">Writing your email...</span>
                     </div>
                   </div>
@@ -666,9 +687,13 @@ export default function GeneratePage() {
             if (msg.type === "error") {
               return (
                 <div key={msg.id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 text-xs font-bold">!</div>
-                  <div className="bg-red-900/30 border border-red-800 rounded-2xl rounded-tl-sm px-5 py-3 max-w-lg">
-                    <p className="text-red-300 text-sm">{msg.content}</p>
+                  <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-2xl rounded-tl-md px-5 py-3 max-w-lg">
+                    <p className="text-red-700 text-sm">{msg.content}</p>
                   </div>
                 </div>
               );
@@ -679,26 +704,36 @@ export default function GeneratePage() {
               const fullText = `Subject: ${subject}\n\n${body}`;
               return (
                 <div key={msg.id} className="flex gap-3">
-                  <Image src="/logo.jpg" alt="CarSalesGuy" width={32} height={32} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  <Image src="/logo.jpg" alt="CarSalesGuy" width={36} height={36} className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
                   <div className="flex-1 max-w-xl space-y-3">
-                    <div className="bg-[#1e1e1e] rounded-2xl rounded-tl-sm overflow-hidden">
-                      <div className="px-5 py-3 border-b border-[#2a2a2a]">
-                        <p className="text-sm"><span className="text-[#9ca3af]">Subject:</span> <span className="text-white">{subject}</span></p>
+                    {/* Email card */}
+                    <div className="bg-white rounded-2xl rounded-tl-md overflow-hidden shadow-sm border border-[#e5e7eb]">
+                      {/* Email header */}
+                      <div className="px-5 py-3 border-b border-[#f0f0f0] bg-[#fafafa]">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-[#9ca3af]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <p className="text-sm font-medium text-[#1a1a2e]">{subject}</p>
+                        </div>
                       </div>
+                      {/* Email body */}
                       <div className="px-5 py-4">
-                        <pre className="text-[#e0e0e0] text-sm whitespace-pre-wrap leading-relaxed font-[inherit]">{body}</pre>
+                        <pre className="text-[#374151] text-sm whitespace-pre-wrap leading-relaxed font-[inherit]">{body}</pre>
                       </div>
-                      <div className="px-5 py-3 border-t border-[#2a2a2a]">
+                      {/* Copy action */}
+                      <div className="px-5 py-3 border-t border-[#f0f0f0] bg-[#fafafa]">
                         <CopyButton text={fullText} />
                       </div>
                     </div>
+                    {/* Tips */}
                     {tips.length > 0 && (
-                      <div className="bg-[#1e1e1e] rounded-2xl px-5 py-4">
-                        <p className="text-[#3b82f6] text-xs font-semibold uppercase tracking-wider mb-2">Tips for this deal</p>
+                      <div className="bg-[#1e3a5f]/5 rounded-2xl px-5 py-4 border border-[#1e3a5f]/10">
+                        <p className="text-[#1e3a5f] text-xs font-semibold uppercase tracking-wider mb-2">Tips for this deal</p>
                         <ul className="space-y-1.5">
                           {tips.map((tip, i) => (
-                            <li key={i} className="text-[#9ca3af] text-sm flex items-start gap-2">
-                              <span className="text-[#3b82f6]">&#8226;</span>
+                            <li key={i} className="text-[#4b5563] text-sm flex items-start gap-2">
+                              <span className="text-[#1e3a5f] mt-0.5">&#8226;</span>
                               <span>{tip}</span>
                             </li>
                           ))}
@@ -713,11 +748,11 @@ export default function GeneratePage() {
             if (msg.type === "options") {
               return (
                 <div key={msg.id} className="flex gap-3">
-                  <Image src="/logo.jpg" alt="CarSalesGuy" width={32} height={32} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  <Image src="/logo.jpg" alt="CarSalesGuy" width={36} height={36} className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
                   <div className="space-y-3 max-w-lg">
                     {msg.content && (
-                      <div className="bg-[#1e1e1e] rounded-2xl rounded-tl-sm px-5 py-3">
-                        <p className="text-[#e0e0e0] text-sm leading-relaxed">{msg.content}</p>
+                      <div className="bg-white rounded-2xl rounded-tl-md px-5 py-3 shadow-sm border border-[#e5e7eb]">
+                        <p className="text-[#374151] text-sm leading-relaxed">{msg.content}</p>
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 pl-1">
@@ -726,7 +761,7 @@ export default function GeneratePage() {
                           key={opt.value}
                           onClick={() => onOptionClick(opt.value, opt.label)}
                           disabled={isLoading}
-                          className="px-4 py-2 rounded-full text-sm font-medium border border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6] hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                          className="px-4 py-2 rounded-xl text-sm font-medium border border-[#1e3a5f]/20 text-[#1e3a5f] bg-white hover:bg-[#1e3a5f] hover:text-white hover:border-[#1e3a5f] shadow-sm transition-all cursor-pointer disabled:opacity-50"
                         >
                           {opt.label}
                         </button>
@@ -740,9 +775,9 @@ export default function GeneratePage() {
             if (msg.role === "assistant") {
               return (
                 <div key={msg.id} className="flex gap-3">
-                  <Image src="/logo.jpg" alt="CarSalesGuy" width={32} height={32} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                  <div className="bg-[#1e1e1e] rounded-2xl rounded-tl-sm px-5 py-3 max-w-lg">
-                    <p className="text-[#e0e0e0] text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  <Image src="/logo.jpg" alt="CarSalesGuy" width={36} height={36} className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
+                  <div className="bg-white rounded-2xl rounded-tl-md px-5 py-3 max-w-lg shadow-sm border border-[#e5e7eb]">
+                    <p className="text-[#374151] text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 </div>
               );
@@ -750,7 +785,7 @@ export default function GeneratePage() {
 
             return (
               <div key={msg.id} className="flex justify-end">
-                <div className="bg-[#3b82f6] rounded-2xl rounded-tr-sm px-5 py-3 max-w-sm">
+                <div className="bg-[#1e3a5f] rounded-2xl rounded-tr-md px-5 py-3 max-w-sm shadow-sm">
                   <p className="text-white text-sm">{msg.content}</p>
                 </div>
               </div>
@@ -760,9 +795,9 @@ export default function GeneratePage() {
         </div>
       </main>
 
-      {/* Input bar — shown during field collection AND refine mode */}
+      {/* Input bar */}
       {(awaitingInput || refineMode) && (
-        <div className="border-t border-[#1e1e1e] bg-[#0a0a0a] px-4 sm:px-6 py-4 flex-shrink-0">
+        <div className="bg-white border-t border-[#e5e7eb] px-4 sm:px-6 py-4 flex-shrink-0">
           <form onSubmit={handleInputSubmit} className="max-w-2xl mx-auto flex gap-3">
             <input
               ref={inputRef}
@@ -771,13 +806,13 @@ export default function GeneratePage() {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={getInputPlaceholder()}
               disabled={isLoading}
-              className="flex-1 bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm text-white placeholder-[#666] outline-none focus:border-[#3b82f6] transition-colors disabled:opacity-50"
+              className="flex-1 bg-[#f8f9fa] border border-[#e5e7eb] rounded-xl px-4 py-3 text-sm text-[#1a1a2e] placeholder-[#9ca3af] outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/10 transition-all disabled:opacity-50"
               autoFocus
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-xl px-5 py-3 text-sm font-medium transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white rounded-xl px-5 py-3 text-sm font-medium transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
