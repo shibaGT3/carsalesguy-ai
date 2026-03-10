@@ -10,11 +10,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CarSalesGuy AI — Negotiate Your Next Car Like a Dealer",
   description:
-    "AI-powered car negotiation emails built on 15+ years of dealership experience and over a billion dollars in sales.",
+    "AI-powered car negotiation emails built on 20 years of dealership experience and over a billion dollars in sales.",
   openGraph: {
     title: "CarSalesGuy AI — Negotiate Your Next Car Like a Dealer",
     description:
-      "AI-powered car negotiation emails built on 15+ years of dealership experience and over a billion dollars in sales.",
+      "AI-powered car negotiation emails built on 20 years of dealership experience and over a billion dollars in sales.",
   },
 };
 

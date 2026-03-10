@@ -29,19 +29,19 @@ export default function Hero() {
         {/* Badge */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#1e3a5f]/5 px-4 py-1.5 text-sm font-medium text-[#1e3a5f]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
-          Built by a dealer with 15+ years experience
+          From a GM who's closed 50,000+ deals
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[#1a1a2e] leading-[1.1] tracking-tight">
-          Negotiate your next car{" "}
-          <span className="text-[#1e3a5f]">like a dealer</span>
+          Stop overpaying{" "}
+          <span className="text-[#1e3a5f]">for your next car</span>
         </h1>
 
         {/* Subheadline */}
         <p className="mt-6 text-lg md:text-xl text-[#6b7280] max-w-2xl leading-relaxed">
-          AI-powered negotiation emails that get dealers competing for your business.
-          Backed by over a billion dollars in real sales experience.
+          Get a ready-to-send dealer email in 2 minutes. Built on insider
+          knowledge from 20 years and $1B+ in real car deals.
         </p>
 
         {/* CTA */}
@@ -50,7 +50,7 @@ export default function Hero() {
             href="/generate"
             className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#1e3a5f]/20 transition-all hover:bg-[#162d4a] hover:shadow-xl hover:shadow-[#1e3a5f]/25 hover:-translate-y-0.5"
           >
-            Start Your Deal
+            Get Your Email Now
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

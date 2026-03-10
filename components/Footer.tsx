@@ -14,7 +14,7 @@ export default function Footer() {
           <Link href="/" className="text-base font-semibold text-[#1a1a2e]">
             CarSalesGuy AI
           </Link>
-          <p className="text-sm text-[#9ca3af]">Built by a dealer, for buyers.</p>
+          <p className="text-sm text-[#9ca3af]">The unfair advantage every car buyer deserves.</p>
         </div>
         <div className="flex gap-6">
           {socialLinks.map((link) => (

@@ -149,7 +149,7 @@ export default function GeneratePage() {
       id: "welcome",
       role: "assistant",
       type: "text",
-      content: "I'm CarSalesGuy AI. I'll write you a negotiation email that gets dealers to compete for your business. Let's get started.",
+      content: "Hey — I'm CarSalesGuy. Tell me what you're buying and I'll write an email that makes dealers fight for your business.",
     },
     {
       id: "deal-type-ask",
