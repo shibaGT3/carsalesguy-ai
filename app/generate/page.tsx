@@ -20,9 +20,9 @@ interface FieldDef {
 function getFields(dealType: string, stage: string): FieldDef[] {
   if (["lease", "finance", "cash"].includes(dealType) && stage === "close") {
     return [
-      { name: "name", question: "What's your full name?", type: "text", required: true, placeholder: "First Last" },
-      { name: "email", question: "What's your email address?", type: "text", required: true, placeholder: "you@email.com" },
-      { name: "phone", question: "What's your phone number? (Required for closing)", type: "text", required: true, placeholder: "(555) 123-4567" },
+      { name: "name", question: "What's your full name? (For the paperwork)", type: "text", required: true, placeholder: "First Last" },
+      { name: "email", question: "What's your best email for the dealer to reach you?", type: "text", required: true, placeholder: "you@email.com" },
+      { name: "phone", question: "What's your phone number? (The dealer will need this to close)", type: "text", required: true, placeholder: "(555) 123-4567" },
       { name: "deliveryPreference", question: "How do you want to take delivery?", type: "select", required: true, options: ["Pick up at dealership", "Home delivery"] },
       { name: "deliveryTiming", question: "When do you want to take delivery?", type: "select", required: true, options: ["Today", "Tomorrow", "This week"] },
     ];
@@ -35,9 +35,7 @@ function getFields(dealType: string, stage: string): FieldDef[] {
       { name: "milesPerYear", question: "How many miles per year?", type: "select", required: true, options: ["7,500", "10,000", "12,000", "15,000"] },
       { name: "downPayment", question: "How much are you putting down / drive-off?", type: "text", required: true, placeholder: "$0, $1,000, $2,000, etc." },
       { name: "zipCode", question: "What's your zip code?", type: "text", required: true, placeholder: "90210" },
-      { name: "name", question: "What's your full name?", type: "text", required: true, placeholder: "First Last" },
-      { name: "email", question: "What's your email address?", type: "text", required: true, placeholder: "you@email.com" },
-      { name: "phone", question: "Phone number? (Optional — press Enter to skip)", type: "text", required: false, placeholder: "Optional" },
+      { name: "name", question: "What's your first name?", type: "text", required: true, placeholder: "First name" },
       { name: "timePreference", question: "How soon are you ready to move?", type: "select", required: true, options: ["Today", "ASAP", "This week", "Soon"] },
     ];
     if (stage === "counter") {
@@ -55,9 +53,7 @@ function getFields(dealType: string, stage: string): FieldDef[] {
       { name: "term", question: "What loan term do you want?", type: "select", required: true, options: ["36 months", "48 months", "60 months", "72 months", "84 months"] },
       { name: "downPayment", question: "How much are you putting down?", type: "text", required: true, placeholder: "$0, $2,000, $5,000, etc." },
       { name: "zipCode", question: "What's your zip code?", type: "text", required: true, placeholder: "90210" },
-      { name: "name", question: "What's your full name?", type: "text", required: true, placeholder: "First Last" },
-      { name: "email", question: "What's your email address?", type: "text", required: true, placeholder: "you@email.com" },
-      { name: "phone", question: "Phone number? (Optional — press Enter to skip)", type: "text", required: false, placeholder: "Optional" },
+      { name: "name", question: "What's your first name?", type: "text", required: true, placeholder: "First name" },
       { name: "timePreference", question: "How soon are you ready to move?", type: "select", required: true, options: ["Today", "ASAP", "This week", "Soon"] },
     ];
     if (stage === "counter") {
@@ -74,9 +70,7 @@ function getFields(dealType: string, stage: string): FieldDef[] {
     const base: FieldDef[] = [
       { name: "vehicle", question: "What vehicle are you looking at? (Stock #, VIN, or Year Make Model Trim)", type: "text", required: true, placeholder: "e.g. 2026 Lexus RX 350" },
       { name: "zipCode", question: "What's your zip code?", type: "text", required: true, placeholder: "90210" },
-      { name: "name", question: "What's your full name?", type: "text", required: true, placeholder: "First Last" },
-      { name: "email", question: "What's your email address?", type: "text", required: true, placeholder: "you@email.com" },
-      { name: "phone", question: "Phone number? (Optional — press Enter to skip)", type: "text", required: false, placeholder: "Optional" },
+      { name: "name", question: "What's your first name?", type: "text", required: true, placeholder: "First name" },
       { name: "timePreference", question: "How soon are you ready to move?", type: "select", required: true, options: ["Today", "ASAP", "This week", "Soon"] },
     ];
     if (stage === "counter") {
@@ -93,9 +87,8 @@ function getFields(dealType: string, stage: string): FieldDef[] {
     return [
       { name: "vehicle", question: "What vehicle are you looking for? (Year Make Model)", type: "text", required: true, placeholder: "e.g. 2026 Toyota Camry" },
       { name: "purchaseType", question: "How are you planning to pay?", type: "select", required: true, options: ["Lease", "Finance", "Cash"] },
-      { name: "name", question: "What's your full name?", type: "text", required: true, placeholder: "First Last" },
-      { name: "email", question: "What's your email address?", type: "text", required: true, placeholder: "you@email.com" },
-      { name: "phone", question: "What's your phone number? (Required for inventory inquiries)", type: "text", required: true, placeholder: "(555) 123-4567" },
+      { name: "name", question: "What's your first name?", type: "text", required: true, placeholder: "First name" },
+      { name: "phone", question: "What's your phone number? (Dealers need this for inventory inquiries)", type: "text", required: true, placeholder: "(555) 123-4567" },
       { name: "timePreference", question: "How soon are you ready to move?", type: "select", required: true, options: ["Today", "ASAP", "This week", "Soon"] },
     ];
   }

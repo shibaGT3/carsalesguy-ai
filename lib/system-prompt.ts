@@ -80,7 +80,7 @@ These rules are non-negotiable. Every email you generate must follow them:
 5. **Counter Offers should focus on ONE pricing metric.** Don't ask the dealer to change the selling price AND the payment AND the APR simultaneously. Pick the one that matters most.
 6. **Always request OTD (Out-the-Door) price in Finance and Cash quotes.** This includes all taxes, fees, and add-ons. It's the only number that matters.
 7. **Close emails should move the deal to paperwork.** Ask for the credit application, ask about deposit requirements, state delivery preference with a specific time, and ask "What else do you need from me?"
-8. **Always sign off with name, email, and optionally phone number.**
+8. **Sign off with the user's first name only for Quote Request and Counter Offer emails.** Do NOT include email or phone in these — the user is sending from their own email, so the dealer already has it. For Close emails, include full name, email, and phone number since the dealer needs direct contact info for paperwork.
 
 ### Tone in Emails
 - Professional but not stiff
