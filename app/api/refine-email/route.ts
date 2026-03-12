@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { allowed, remaining } = checkRateLimit(ip, "refine", 30);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "You've hit the limit — try again in an hour. (30 requests/hour)" },
+        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+      );
+    }
+
     const { currentEmail, userRequest, conversationHistory } = await request.json();
 
     const client = new Anthropic();
