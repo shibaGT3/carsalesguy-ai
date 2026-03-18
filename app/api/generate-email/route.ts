@@ -30,6 +30,18 @@ export async function POST(request: NextRequest) {
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
+    // Check if the AI returned an actual email (has Subject: line and ---TIPS---)
+    const hasEmail = responseText.includes("Subject: ") && responseText.includes("---TIPS---");
+
+    if (!hasEmail) {
+      // The AI returned advice/coaching instead of an email
+      // (e.g., "go find your car first", general guidance, etc.)
+      return NextResponse.json({
+        type: "advice",
+        message: responseText,
+      });
+    }
+
     // Split response into email and tips sections
     const [emailSection, tipsSection] = responseText.split("---TIPS---");
 
@@ -62,6 +74,7 @@ export async function POST(request: NextRequest) {
       : ["Send this to 3-5 dealers for the best results"];
 
     return NextResponse.json({
+      type: "email",
       email: { subject, body },
       tips,
     });

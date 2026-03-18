@@ -4,6 +4,20 @@ interface CannedAnswer {
 }
 
 const cannedAnswers: CannedAnswer[] = [
+  // ── Convincing spouse / partner ──
+  {
+    patterns: [
+      /convince.*(wife|husband|spouse|partner)/i,
+      /(wife|husband|spouse|partner).*(on board|agree|approve|let me|okay with|cool with)/i,
+      /(wife|husband|spouse|partner).*(doesn.t want|not sure|against|hesitant|worried)/i,
+      /how do i get.*(wife|husband|spouse|partner)/i,
+      /(wife|husband|spouse|partner).*(buy|purchase|lease)/i,
+      /my (wife|husband|spouse|partner)/i,
+    ],
+    answer:
+      "This comes up on almost every deal — you're not alone. Here's how to handle it like a pro:\n\n1. **Get aligned on budget first, not the car.** If you and your spouse agree on what you can afford monthly or total, the specific vehicle becomes a much easier conversation.\n\n2. **Bring them into the process early.** Don't go pick the car alone and then try to sell them on it. Browse together online, test drive together. When they feel included in the decision, they're far more likely to say yes.\n\n3. **Let the numbers do the talking.** Once you have quotes from 3-5 dealers, show your spouse the real numbers — not a guess, not a hope, the actual market price. That removes the \"what if we're overpaying\" anxiety.\n\n4. **Frame it around their priorities.** Safety features, reliability, total cost of ownership, whatever matters to them — lead with that, not horsepower or the color.\n\n5. **Don't rush it.** A dealer will always have another car. If your spouse needs a week to think it over, take the week. A good deal done right beats a great deal that causes a fight.\n\nBottom line: the best car deals happen when both people are on the same page before you ever talk to a dealer.",
+  },
+
   // ── How many dealers should I send this to? ──
   {
     patterns: [

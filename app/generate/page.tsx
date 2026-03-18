@@ -167,6 +167,9 @@ export default function GeneratePage() {
   const [currentEmail, setCurrentEmail] = useState<{ subject: string; body: string } | null>(null);
   const [refineHistory, setRefineHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
 
+  // ── Analyze dealer response mode ──
+  const [analyzeMode, setAnalyzeMode] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -175,10 +178,10 @@ export default function GeneratePage() {
   }, [messages]);
 
   useEffect(() => {
-    if (awaitingInput || refineMode) {
+    if (awaitingInput || refineMode || analyzeMode) {
       inputRef.current?.focus();
     }
-  }, [awaitingInput, refineMode]);
+  }, [awaitingInput, refineMode, analyzeMode]);
 
   const addMessages = (...msgs: ChatMessage[]) => {
     setMessages((prev) => [...prev, ...msgs]);
@@ -281,6 +284,14 @@ export default function GeneratePage() {
     e.preventDefault();
     const value = inputValue.trim();
 
+    if (analyzeMode) {
+      if (!value) return;
+      addMessages({ id: `user-${Date.now()}`, role: "user", type: "text", content: value });
+      setInputValue("");
+      handleAnalyze(value);
+      return;
+    }
+
     if (refineMode) {
       if (!value) return;
       addMessages({ id: `user-${Date.now()}`, role: "user", type: "text", content: value });
@@ -331,42 +342,66 @@ export default function GeneratePage() {
       }
 
       const data = await response.json();
-      const email = { subject: data.email.subject, body: data.email.body };
 
-      setCurrentEmail(email);
-      setRefineHistory([]);
-
-      setMessages((prev) => [
-        ...prev.filter((m) => m.type !== "loading"),
-        {
-          id: `email-${Date.now()}`,
-          role: "assistant",
-          type: "email",
-          emailResult: {
-            subject: email.subject,
-            body: email.body,
-            tips: data.tips,
+      if (data.type === "advice") {
+        // AI returned coaching/advice instead of an email
+        setMessages((prev) => [
+          ...prev.filter((m) => m.type !== "loading"),
+          {
+            id: `advice-${Date.now()}`,
+            role: "assistant",
+            type: "text",
+            content: data.message,
           },
-        },
-        {
-          id: `refine-prompt-${Date.now()}`,
-          role: "assistant",
-          type: "text",
-          content: "Want to adjust anything? Tell me to change the tone, add details, make it shorter — or ask me anything about your deal. When you're happy with the email, hit one of the options below.",
-        },
-        {
-          id: `next-options-${Date.now()}`,
-          role: "assistant",
-          type: "options",
-          content: undefined,
-          options: [
-            { label: "I'm good — what's next?", value: "__done__" },
-            { label: "Start a new deal", value: "__new_deal__" },
-          ],
-        },
-      ]);
+          {
+            id: `advice-options-${Date.now()}`,
+            role: "assistant",
+            type: "options",
+            content: undefined,
+            options: [
+              { label: "Start a new deal", value: "__new_deal__" },
+            ],
+          },
+        ]);
+        setRefineMode(false);
+      } else {
+        const email = { subject: data.email.subject, body: data.email.body };
 
-      setRefineMode(true);
+        setCurrentEmail(email);
+        setRefineHistory([]);
+
+        setMessages((prev) => [
+          ...prev.filter((m) => m.type !== "loading"),
+          {
+            id: `email-${Date.now()}`,
+            role: "assistant",
+            type: "email",
+            emailResult: {
+              subject: email.subject,
+              body: email.body,
+              tips: data.tips,
+            },
+          },
+          {
+            id: `refine-prompt-${Date.now()}`,
+            role: "assistant",
+            type: "text",
+            content: "Want to adjust anything? Tell me to change the tone, add details, make it shorter — or ask me anything about your deal. When you're happy with the email, hit one of the options below.",
+          },
+          {
+            id: `next-options-${Date.now()}`,
+            role: "assistant",
+            type: "options",
+            content: undefined,
+            options: [
+              { label: "I'm good — what's next?", value: "__done__" },
+              { label: "Start a new deal", value: "__new_deal__" },
+            ],
+          },
+        ]);
+
+        setRefineMode(true);
+      }
     } catch (err) {
       setMessages((prev) => [
         ...prev.filter((m) => m.type !== "loading"),
@@ -515,6 +550,89 @@ export default function GeneratePage() {
     }
   };
 
+  // ── Handle dealer response analysis ──
+  const handleAnalyze = async (dealerResponse: string) => {
+    setIsLoading(true);
+    setAnalyzeMode(false);
+
+    addMessages({
+      id: `loading-${Date.now()}`,
+      role: "assistant",
+      type: "loading",
+    });
+
+    try {
+      const response = await fetch("/api/analyze-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dealType,
+          formData: collectedData,
+          currentEmail,
+          dealerResponse,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to analyze response");
+      }
+
+      const data = await response.json();
+
+      const postAnalysisOptions: { label: string; value: string }[] = [];
+
+      if (data.recommendation === "counter" && stage !== "counter" && stage !== "close" && dealType !== "inventory") {
+        postAnalysisOptions.push({ label: "Generate a counter offer", value: "__counter__" });
+      }
+      if (data.recommendation === "accept" && stage !== "close" && dealType !== "inventory") {
+        postAnalysisOptions.push({ label: "Close the deal", value: "__close__" });
+      }
+      if (stage !== "counter" && stage !== "close" && dealType !== "inventory") {
+        if (data.recommendation !== "counter") {
+          postAnalysisOptions.push({ label: "Counter Offer", value: "__counter__" });
+        }
+      }
+      if (stage !== "close" && dealType !== "inventory") {
+        if (data.recommendation !== "accept") {
+          postAnalysisOptions.push({ label: "Close the deal", value: "__close__" });
+        }
+      }
+      postAnalysisOptions.push({ label: "Analyze another response", value: "__analyze__" });
+      postAnalysisOptions.push({ label: "Start a new deal", value: "__new_deal__" });
+
+      setMessages((prev) => [
+        ...prev.filter((m) => m.type !== "loading"),
+        {
+          id: `analysis-${Date.now()}`,
+          role: "assistant",
+          type: "text",
+          content: data.analysis,
+        },
+        {
+          id: `analysis-options-${Date.now()}`,
+          role: "assistant",
+          type: "options",
+          content: "What do you want to do next?",
+          options: postAnalysisOptions,
+        },
+      ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev.filter((m) => m.type !== "loading"),
+        {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          type: "error",
+          content: err instanceof Error ? err.message : "Something went wrong. Try again.",
+        },
+      ]);
+      setAnalyzeMode(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ── Handle next-step options ──
   const handleNextStep = (value: string, label: string) => {
     if (value === "__new_deal__") {
@@ -525,6 +643,7 @@ export default function GeneratePage() {
       setCollectedData({});
       setAwaitingInput(false);
       setRefineMode(false);
+      setAnalyzeMode(false);
       setCurrentEmail(null);
       setRefineHistory([]);
       setMessages([
@@ -549,15 +668,17 @@ export default function GeneratePage() {
       addMessages({ id: `user-done-${Date.now()}`, role: "user", type: "text", content: label });
       setRefineMode(false);
 
-      const nextOptions: { label: string; value: string }[] = [
-        { label: "Start a new deal", value: "__new_deal__" },
-      ];
+      const nextOptions: { label: string; value: string }[] = [];
+      if (dealType !== "inventory") {
+        nextOptions.push({ label: "I got a response from a dealer", value: "__analyze__" });
+      }
       if (stage !== "counter" && stage !== "close" && dealType !== "inventory") {
         nextOptions.push({ label: "Counter Offer", value: "__counter__" });
       }
       if (stage !== "close" && dealType !== "inventory") {
         nextOptions.push({ label: "Close the deal", value: "__close__" });
       }
+      nextOptions.push({ label: "Start a new deal", value: "__new_deal__" });
 
       addMessages({
         id: `next-steps-${Date.now()}`,
@@ -569,12 +690,29 @@ export default function GeneratePage() {
       return;
     }
 
+    if (value === "__analyze__") {
+      addMessages({ id: `user-analyze-${Date.now()}`, role: "user", type: "text", content: label });
+      setRefineMode(false);
+
+      setTimeout(() => {
+        addMessages({
+          id: `analyze-prompt-${Date.now()}`,
+          role: "assistant",
+          type: "text",
+          content: "Paste the dealer's response below — their email, text message, or quote. I'll break down what they're really saying and tell you exactly what to do next.",
+        });
+        setAnalyzeMode(true);
+      }, 300);
+      return;
+    }
+
     if (value === "__counter__" || value === "__close__") {
       const newStage = value === "__counter__" ? "counter" : "close";
       addMessages({ id: `user-next-${Date.now()}`, role: "user", type: "text", content: label });
 
       setStage(newStage);
       setRefineMode(false);
+      setAnalyzeMode(false);
       setCurrentEmail(null);
       setRefineHistory([]);
       const newFields = getFields(dealType!, newStage);
@@ -609,6 +747,7 @@ export default function GeneratePage() {
 
   // ── Input bar placeholder ──
   const getInputPlaceholder = () => {
+    if (analyzeMode) return "Paste the dealer's response here...";
     if (refineMode) return "Ask me to change the email, or ask about your deal...";
     return fields[currentFieldIndex]?.placeholder || "Type your answer...";
   };
@@ -632,6 +771,7 @@ export default function GeneratePage() {
               setCollectedData({});
               setAwaitingInput(false);
               setRefineMode(false);
+              setAnalyzeMode(false);
               setCurrentEmail(null);
               setRefineHistory([]);
               setMessages([
@@ -670,7 +810,7 @@ export default function GeneratePage() {
                       <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:0ms]" />
                       <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:150ms]" />
                       <span className="w-2 h-2 bg-[#1e3a5f]/30 rounded-full animate-bounce [animation-delay:300ms]" />
-                      <span className="text-[#9ca3af] text-sm ml-2">Writing your email...</span>
+                      <span className="text-[#9ca3af] text-sm ml-2">Thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -789,7 +929,7 @@ export default function GeneratePage() {
       </main>
 
       {/* Input bar */}
-      {(awaitingInput || refineMode) && (
+      {(awaitingInput || refineMode || analyzeMode) && (
         <div className="bg-white border-t border-[#e5e7eb] px-4 sm:px-6 py-4 flex-shrink-0">
           <form onSubmit={handleInputSubmit} className="max-w-2xl mx-auto flex gap-3">
             <input
