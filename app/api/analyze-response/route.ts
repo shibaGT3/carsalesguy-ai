@@ -55,7 +55,7 @@ Be direct and specific. No generic advice — tell me what to do based on THIS r
 
     const client = new Anthropic();
     const message = await client.messages.create({
-      model: "claude-opus-4-6",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: `${SYSTEM_PROMPT}
 
