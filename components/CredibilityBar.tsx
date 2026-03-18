@@ -1,55 +1,30 @@
-const stats = [
-  {
-    value: "20",
-    label: "Years on the dealer side",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    value: "$1B+",
-    label: "In closed deals",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    value: "500+",
-    label: "Cars moved per month",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-      </svg>
-    ),
-  },
-  {
-    value: "GM",
-    label: "Luxury dealership GM",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-      </svg>
-    ),
-  },
-];
-
 export default function CredibilityBar() {
+  const stats = [
+    { value: "20+", label: "Years in the business", sublabel: "Dealer side experience" },
+    { value: "$1B+", label: "In closed deals", sublabel: "Real transaction volume" },
+    { value: "50K+", label: "Deals closed", sublabel: "Across every deal type" },
+    { value: "500+", label: "Cars per month", sublabel: "At peak volume" },
+  ];
+
   return (
-    <section className="bg-white border-y border-[#e5e7eb] px-6 py-10">
-      <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-6">
-        {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col items-center text-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-[#1e3a5f]/5 flex items-center justify-center text-[#1e3a5f]">
-              {stat.icon}
+    <section className="relative bg-white px-6 py-16 md:py-20">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold text-[#10b981] uppercase tracking-wider mb-3">Why trust us</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0f172a]">Built by a real dealer, not a blogger</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="relative text-center p-6 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] hover:border-[#10b981]/30 hover:bg-[#f0fdf4]/50 transition-all duration-300"
+            >
+              <p className="text-3xl md:text-4xl font-black text-[#0f172a] mb-1">{stat.value}</p>
+              <p className="text-sm font-semibold text-[#0f172a] mb-0.5">{stat.label}</p>
+              <p className="text-xs text-[#94a3b8]">{stat.sublabel}</p>
             </div>
-            <p className="text-2xl font-bold text-[#1a1a2e]">{stat.value}</p>
-            <p className="text-sm text-[#6b7280]">{stat.label}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

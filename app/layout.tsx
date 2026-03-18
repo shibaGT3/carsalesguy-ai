@@ -8,13 +8,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CarSalesGuy AI — Negotiate Your Next Car Like a Dealer",
+  title: "CarSalesGuy AI — Negotiate Your Next Car Like a Pro",
   description:
-    "AI-powered car negotiation emails built on 20 years of dealership experience and over a billion dollars in sales.",
+    "AI-powered negotiation emails built on 20 years of dealership experience and $1B+ in real car deals. Stop overpaying — get the insider edge.",
   openGraph: {
-    title: "CarSalesGuy AI — Negotiate Your Next Car Like a Dealer",
+    title: "CarSalesGuy AI — Negotiate Your Next Car Like a Pro",
     description:
-      "AI-powered car negotiation emails built on 20 years of dealership experience and over a billion dollars in sales.",
+      "AI-powered negotiation emails built on 20 years of dealership experience and $1B+ in real car deals.",
+    siteName: "CarSalesGuy AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CarSalesGuy AI — Negotiate Your Next Car Like a Pro",
+    description:
+      "AI-powered negotiation emails from a GM who's closed 50,000+ deals.",
   },
 };
 
@@ -29,12 +37,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
-        className={`${geistMono.variable} antialiased bg-white text-[#1a1a2e]`}
+        className={`${geistMono.variable} antialiased bg-white text-[#0f172a]`}
       >
         {children}
       </body>
